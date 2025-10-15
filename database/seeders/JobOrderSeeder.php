@@ -31,7 +31,7 @@ class JobOrderSeeder extends Seeder
                 'customer_name' => $faker->name(),
                 'pickup_address' => $faker->address(),
                 'destination_address' => $faker->address(),
-                'status_id' => $faker->randomElement($statuses),
+                'status_job_order_id' => $faker->randomElement($statuses),
                 'driver_id' => $faker->randomElement($drivers),
                 'vehicle_id' => $faker->randomElement($vehicles),
                 'total_weight' => $faker->randomFloat(2, 100, 5000),
