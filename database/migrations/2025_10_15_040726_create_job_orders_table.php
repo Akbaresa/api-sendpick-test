@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('customer_name');
             $table->text('pickup_address');
             $table->text('destination_address');
-            $table->foreignId('status_id')->constrained('status_job_orders', 'id_status_job_order');
+            $table->foreignId('status_job_order_id')->constrained('status_job_orders', 'id_status_job_order');
             $table->foreignId('driver_id')->nullable()->constrained('users', 'id_user')->nullOnDelete();
             $table->foreignId('vehicle_id')->nullable()->constrained('vehicles', 'id_vehicle')->nullOnDelete();
             $table->float('total_weight')->nullable();
