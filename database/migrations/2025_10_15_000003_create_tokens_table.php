@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tokens', function (Blueprint $table) {
+        Schema::create('token', function (Blueprint $table) {
             $table->id('id_token');
             $table->foreignId('user_id')->constrained('users', 'id_user');
             $table->string('token', 80)->unique();
             $table->string('device_name')->nullable();
             $table->timestamp('last_used_at')->nullable();
+            $table->timestamp('expired_at')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tokens');
+        Schema::dropIfExists('token');
     }
 };
