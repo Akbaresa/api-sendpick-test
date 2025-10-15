@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-
+use Illuminate\Contracts\Validation\Validator;
 class UserLoginRequest extends FormRequest
 {
     /**
@@ -35,5 +35,18 @@ class UserLoginRequest extends FormRequest
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
         ];
+    }
+    /**
+     * Override default validation response
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'data' => $validator->errors(),
+            ], 422)
+        );
     }
 }
