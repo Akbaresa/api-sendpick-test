@@ -4,7 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\Token;
+use Illuminate\Support\Facades\Auth;
 
 class AuthenticateWithBearerToken
 {
@@ -18,13 +19,23 @@ class AuthenticateWithBearerToken
 
         $token = substr($authHeader, 7);
 
-        $user = User::where('api_token', $token)->first();
+        $userToken = Token::with('user')->where('token', $token)->first();
 
-        if (!$user) {
+        if (!$userToken) {
             return response()->json(['message' => 'Invalid token'], 401);
         }
 
-        auth()->setUser($user);
+        if ($userToken->user === null) {
+            return response()->json(['message' => 'User not found'], 401);
+        }
+
+        if ($userToken->isExpired()) {
+            return response()->json(['message' => 'Token expired'], 401);
+        }
+
+        $userToken->update(['last_used_at' => now()]);
+
+        Auth::login($userToken->user);
 
         return $next($request);
     }

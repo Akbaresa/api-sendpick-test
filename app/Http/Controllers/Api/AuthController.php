@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserLoginRequest;
+use App\Models\Token;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Traits\ApiResponse;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -23,15 +25,22 @@ class AuthController extends Controller
             }
 
             $token = Str::random(60);
-            $user->update(['api_token' => $token]);
+
+            Token::create([
+                'user_id' => $user->id_user,
+                'token' => $token,
+                'expired_at' => Carbon::now()->addHours(7),
+                'device_name' => $request->header('User-Agent'),
+                'last_used_at' => now(),
+            ]);
 
             return $this->success([
                 'token' => $token,
-                'user' => $user
+                'user' => $user,
+                'expired_at' => Carbon::now()->addHours(7)->toDateTimeString()
             ], 'Login successful');
-
-        } catch (Exception $e) {
-            return $this->error('Gagal Melakukan Autentikasi', 500);
+        } catch (\Throwable $e) {
+            return $this->error('Login failed: ' . $e->getMessage(), 500);
         }
     }
 }
