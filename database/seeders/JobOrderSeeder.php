@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class JobOrderSeeder extends Seeder
 {
@@ -20,7 +21,7 @@ class JobOrderSeeder extends Seeder
 
         $statuses = StatusJobOrder::pluck('id_status_job_order')->toArray();
         $drivers = User::whereHas('role', fn($q) => $q->where('role_name', 'driver'))
-            ->pluck('id')
+            ->pluck('id_user')
             ->toArray();
         $vehicles = Vehicle::pluck('id_vehicle')->toArray();
 
