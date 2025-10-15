@@ -43,4 +43,23 @@ class AuthController extends Controller
             return $this->error('Login failed: ' . $e->getMessage(), 500);
         }
     }
+    
+    public function me()
+    {
+        try {
+            $user = auth()->user();
+
+            if (!$user) {
+                return $this->error('Unauthorized', 401);
+            }
+
+            return $this->success([
+                'user' => $user
+            ], 'User retrieved successfully');
+
+        } catch (\Throwable $e) {
+            return $this->error('Failed to fetch user: ' . $e->getMessage(), 500);
+        }
+    }
+
 }
