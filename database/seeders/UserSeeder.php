@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -22,21 +23,21 @@ class UserSeeder extends Seeder
             'name' => 'Admin SendPick',
             'email' => 'admin@sendpick.test',
             'password' => Hash::make('password'),
-            'role_id' => $adminRole->id,
+            'role_id' => $adminRole->id_role,
         ]);
 
         User::create([
             'name' => 'Dispatcher One',
             'email' => 'dispatcher@sendpick.test',
             'password' => Hash::make('password'),
-            'role_id' => $dispatcherRole->id,
+            'role_id' => $dispatcherRole->id_role,
         ]);
 
         User::create([
             'name' => 'Driver One',
             'email' => 'driver@sendpick.test',
             'password' => Hash::make('password'),
-            'role_id' => $driverRole->id,
+            'role_id' => $driverRole->id_role,
         ]);
     }
 }
