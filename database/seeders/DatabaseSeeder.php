@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             StatusJobOrderSeeder::class,
             VehicleSeeder::class,
             JobOrderSeeder::class,
+            LocationSeeder::class,
+            ManifestSeeder::class,
         ]);
     }
 

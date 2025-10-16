@@ -18,6 +18,12 @@ return new class extends Migration
             $table->text('address');
             $table->decimal('lat', 10, 6)->nullable();
             $table->decimal('lng', 10, 6)->nullable();
+            $table->string('province')->nullable();
+            $table->string('city')->nullable();
+            $table->string('district')->nullable();
+            $table->integer('city_id')->nullable();
+            $table->integer('province_id')->nullable();
+            $table->integer('district_id')->nullable();
             $table->timestamps();
         });
     }
