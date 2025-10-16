@@ -8,7 +8,7 @@ use App\Models\JobOrder;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\DB;
-
+use App\Services\DistanceAndCostService;
 class JobOrderController extends Controller
 {
     use ApiResponse;
@@ -95,35 +95,82 @@ class JobOrderController extends Controller
 
     public function show($id)
     {
-    try {
-        $jobOrder = DB::table('job_orders')
-            ->select([
-                'job_orders.id_job_order',
-                'job_orders.job_number',
-                'job_orders.customer_name',
-                'job_orders.pickup_address',
-                'job_orders.destination_address',
-                'job_orders.total_weight',
-                'job_orders.total_volume',
-                'job_orders.created_at',
-                'status_job_orders.status_job_order_name as status_name',
-                'users.name as driver_name',
-                'vehicles.plate_number as vehicle_plate',
-            ])
-            ->leftJoin('status_job_orders', 'status_job_orders.id_status_job_order', '=', 'job_orders.status_job_order_id')
-            ->leftJoin('users', 'users.id_user', '=', 'job_orders.driver_id')
-            ->leftJoin('vehicles', 'vehicles.id_vehicle', '=', 'job_orders.vehicle_id')
-            ->where('job_orders.id_job_order', $id)
-            ->first();
+        try {
+            $jobOrder = DB::table('job_orders')
+                ->select([
+                    'job_orders.id_job_order',
+                    'job_orders.job_number',
+                    'job_orders.customer_name',
+                    'job_orders.pickup_address',
+                    'job_orders.destination_address',
+                    'job_orders.total_weight',
+                    'job_orders.total_volume',
+                    'job_orders.created_at',
+                    'status_job_orders.status_job_order_name as status_name',
+                    'users.name as driver_name',
+                    'vehicles.plate_number as vehicle_plate',
+                ])
+                ->leftJoin('status_job_orders', 'status_job_orders.id_status_job_order', '=', 'job_orders.status_job_order_id')
+                ->leftJoin('users', 'users.id_user', '=', 'job_orders.driver_id')
+                ->leftJoin('vehicles', 'vehicles.id_vehicle', '=', 'job_orders.vehicle_id')
+                ->where('job_orders.id_job_order', $id)
+                ->first();
 
-        if (!$jobOrder) {
-            return $this->error('Job Order tidak ditemukan', 404);
+            if (!$jobOrder) {
+                return $this->error('Job Order tidak ditemukan', 404);
+            }
+
+            $manifests = DB::table('manifests')
+                ->select([
+                    'id_manifest',
+                    'item_name',
+                    'quantity',
+                    'weight',
+                    'volume',
+                    'notes',
+                    'created_at'
+                ])
+                ->where('job_order_id', $id)
+                ->get();
+
+            $locations = DB::table('locations')
+                ->select([
+                    'id_location',
+                    'type',
+                    'address',
+                    'lat',
+                    'lng',
+                    'city',
+                    'province',
+                    'city_id',
+                    'province_id',
+                    'created_at'
+                ])
+                ->where('job_order_id', $id)
+                ->get();
+
+            $data = [
+                'job_order' => $jobOrder,
+                'manifests' => $manifests,
+                'locations' => $locations,
+            ];
+
+            return $this->success($data, 'Detail Job Order berhasil diambil');
+        } catch (\Throwable $e) {
+            return $this->error('Gagal mengambil detail Job Order: ' . $e->getMessage(), 500);
         }
-
-        return $this->success($jobOrder, 'Detail Job Order ditemukan');
-    } catch (\Throwable $e) {
-        return $this->error('Gagal mengambil detail job order', 500, $e->getMessage());
     }
-}
+
+    public function showDistanceAndCost($id){
+        try {
+            $service = new DistanceAndCostService();
+            $result = $service->calculateForJobOrder($id);
+
+            return $this->success($result, 'Berhasil menampilkan jarak dan ongkir');
+        } catch (\Throwable $e) {
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
 
 }
