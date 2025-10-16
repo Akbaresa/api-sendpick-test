@@ -92,4 +92,38 @@ class JobOrderController extends Controller
             return $this->error('Job Gagal Terkirim', 500);
         }
     }
+
+    public function show($id)
+    {
+    try {
+        $jobOrder = DB::table('job_orders')
+            ->select([
+                'job_orders.id_job_order',
+                'job_orders.job_number',
+                'job_orders.customer_name',
+                'job_orders.pickup_address',
+                'job_orders.destination_address',
+                'job_orders.total_weight',
+                'job_orders.total_volume',
+                'job_orders.created_at',
+                'status_job_orders.status_job_order_name as status_name',
+                'users.name as driver_name',
+                'vehicles.plate_number as vehicle_plate',
+            ])
+            ->leftJoin('status_job_orders', 'status_job_orders.id_status_job_order', '=', 'job_orders.status_job_order_id')
+            ->leftJoin('users', 'users.id_user', '=', 'job_orders.driver_id')
+            ->leftJoin('vehicles', 'vehicles.id_vehicle', '=', 'job_orders.vehicle_id')
+            ->where('job_orders.id_job_order', $id)
+            ->first();
+
+        if (!$jobOrder) {
+            return $this->error('Job Order tidak ditemukan', 404);
+        }
+
+        return $this->success($jobOrder, 'Detail Job Order ditemukan');
+    } catch (\Throwable $e) {
+        return $this->error('Gagal mengambil detail job order', 500, $e->getMessage());
+    }
+}
+
 }

@@ -10,6 +10,8 @@ Route::middleware('auth.bearer.admin')->group(function () {
     Route::prefix('auth')->group(function(){
         Route::post('/me', [AuthController::class, 'me']);
     });
-
-    Route::get('/job-orders', [JobOrderController::class, 'index']);
+    Route::prefix('job-orders')->group(function(){
+        Route::get('/', [JobOrderController::class, 'index']);
+        Route::get('/{id}', [JobOrderController::class, 'show']);
+    });
 });
