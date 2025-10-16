@@ -3,8 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\JobOrderController;
+use App\Http\Controllers\Api\RajaOngkirController;
 
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware('guest');
+
 
 Route::middleware('auth.bearer.admin')->group(function () {
     Route::prefix('auth')->group(function(){
@@ -13,5 +15,6 @@ Route::middleware('auth.bearer.admin')->group(function () {
     Route::prefix('job-orders')->group(function(){
         Route::get('/', [JobOrderController::class, 'index']);
         Route::get('/{id}', [JobOrderController::class, 'show']);
+        Route::get('/get-distance-cost/{id}', [JobOrderController::class, 'showDistanceAndCost']);
     });
 });
